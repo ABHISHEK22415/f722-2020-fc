@@ -1,7 +1,7 @@
 # F722-2020 Flight Controller
 
 <p align="center">
-  <img src="docs/images/parts-iso.png" alt="3D model of the F722-2020 flight controller on a display pedestal" width="640">
+  <img src="docs/images/hero-spin.gif" alt="3D model of the F722-2020 flight controller rotating on a display pedestal" width="640">
 </p>
 
 A 20×20 mm FPV flight controller built around the **STM32F722RET6** and **MPU6000** gyro, designed to pin out every connection an LQFP64 F7 can offer: **6 hardware UARTs, 8 motor outputs**, analog OSD, blackbox flash, barometer and switchable 10 V for an HD VTX.
