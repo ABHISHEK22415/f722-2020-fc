@@ -1,6 +1,28 @@
 # F722-2020 Flight Controller
 
+<p align="center">
+  <img src="docs/images/parts-iso.png" alt="3D model of the F722-2020 flight controller on a display pedestal" width="640">
+</p>
+
 A 20×20 mm FPV flight controller built around the **STM32F722RET6** and **MPU6000** gyro, designed to pin out every connection an LQFP64 F7 can offer: **6 hardware UARTs, 8 motor outputs**, analog OSD, blackbox flash, barometer and switchable 10 V for an HD VTX.
+
+**[Open the interactive 3D viewer →](https://abhishek22415.github.io/f722-2020-fc/viewer/)** — orbit the board, flip it over, tap any part, locate each UART, and switch on **Traces** to see the signal routing.
+
+## 3D views
+
+| Parts, top side | Signal traces, top side |
+| :---: | :---: |
+| <img src="docs/images/parts-iso.png" alt="Iso view of the top side with the STM32F722, MPU6000, flash, baro and LDOs" width="420"> | <img src="docs/images/traces-top.png" alt="Top view with colour-coded traces from the MCU to the gyro, UART pads, motor pads and I2C" width="420"> |
+| STM32F722, MPU6000 at the front centre, 16 MB flash, baro, both 3.3 V LDOs and 32 edge pads | Gyro SPI (blue), UARTs (amber), motors (green), I2C (purple), debug and ADC (grey) |
+
+| Signal traces, bottom side | Port locator |
+| :---: | :---: |
+| <img src="docs/images/traces-bottom.png" alt="Bottom view with the ESC, GPS and VTX plugs, USB-C, OSD, bucks and traces through vias" width="420"> | <img src="docs/images/ui-port.png" alt="Viewer interface with UART2 selected, its traces highlighted and the port list beside the model" width="420"> |
+| ESC, GPS and HD VTX plugs, USB-C, AT7456E OSD and both bucks; traces reach the plugs through vias | Pick a UART and the viewer flips to the right side, highlights its pads and dims every other trace |
+
+The trace routing is illustrative: it shows where each signal goes, not a finished PCB layout.
+
+## Specs
 
 | | |
 | --- | --- |
@@ -17,12 +39,6 @@ A 20×20 mm FPV flight controller built around the **STM32F722RET6** and **MPU60
 
 **Rev A — design spec, not yet laid out.** A noise and EMI review against datasheets found 15 issues (4 high severity) that must be fixed before PCB layout. See [the review](docs/noise-review.md); the BOM marks every affected part.
 
-## 3D preview
-
-Open [`viewer/index.html`](viewer/index.html) in a browser for an interactive 1:1 model of the board on a display pedestal. Drag to orbit, flip to the bottom side, tap any part for its details, or pick a UART to see where it comes out.
-
-To view it online, enable GitHub Pages for this repo (Settings → Pages → deploy from the `main` branch) and open `/viewer/`.
-
 ## Repository layout
 
 | Path | Contents |
@@ -32,7 +48,8 @@ To view it online, enable GitHub Pages for this repo (Settings → Pages → dep
 | [`hardware/pinout.csv`](hardware/pinout.csv) | MCU pin assignments |
 | [`hardware/bom.csv`](hardware/bom.csv) | Main BOM with the review status of each part |
 | [`firmware/betaflight/CUSTOMF722_2020.config`](firmware/betaflight/CUSTOMF722_2020.config) | Betaflight starting config (untested) |
-| [`viewer/index.html`](viewer/index.html) | Interactive 3D model |
+| [`viewer/index.html`](viewer/index.html) | Interactive 3D model; open it locally in any browser, or add `#traces` to the URL to start with traces on |
+| [`docs/images/`](docs/images) | Renders of the 3D model used in this README |
 
 ## Next steps
 

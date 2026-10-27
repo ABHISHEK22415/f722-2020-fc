@@ -85,6 +85,16 @@ button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(
 .hint { left: 12px; }
 .scale { right: 12px; }
 @media (max-width: 520px) { .scale { display: none; } }
+.legend {
+  position: absolute; right: 12px; bottom: 10px; max-width: calc(100% - 24px);
+  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 12px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 86%, transparent); padding: 6px 9px; border-radius: 3px; pointer-events: none;
+}
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend em { flex-basis: 100%; text-align: right; font-style: normal; color: var(--muted); }
+@media (max-width: 640px) { .legend + .hint, .viewer:has(.legend:not([hidden])) .hint { display: none; } }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--mono); font-size: 13px; color: var(--muted); pointer-events: none; }
 
 aside { display: grid; gap: 16px; min-width: 0; }
@@ -134,9 +144,19 @@ dd { margin: 0; min-width: 0; }
         <span class="sep"></span>
         <button type="button" id="flip" aria-pressed="false">Show bottom side</button>
         <button type="button" id="spin" aria-pressed="true">Spin</button>
+        <button type="button" id="traces" aria-pressed="false">Traces</button>
       </div>
       <p class="overlay-note hint">Drag to orbit · scroll or pinch to zoom · tap a part</p>
-      <p class="overlay-note scale">Modelled 1:1 in mm</p>
+      <p class="overlay-note scale" id="scaleNote">Modelled 1:1 in mm</p>
+      <div class="legend" id="legend" hidden>
+        <span><i style="background:#45b0ff"></i>Gyro SPI</span>
+        <span><i style="background:#ffb547"></i>UART</span>
+        <span><i style="background:#5fd37f"></i>Motors</span>
+        <span><i style="background:#c792ff"></i>I2C</span>
+        <span><i style="background:#7fe0e6"></i>USB</span>
+        <span><i style="background:#c9ced6"></i>Debug, ADC</span>
+        <em>Illustrative routing, not a finished PCB</em>
+      </div>
     </section>
 
     <aside>
@@ -229,11 +249,11 @@ dd { margin: 0; min-width: 0; }
     const col = [], p = g.attributes.position;
     for (let i = 0; i < p.count; i++) {
       const t = (p.getY(i) / 60 + 1) / 2;
-      col.push(0.10 + 0.55 * t, 0.11 + 0.56 * t, 0.13 + 0.60 * t);
+      col.push(0.04 + 0.34 * t, 0.042 + 0.35 * t, 0.05 + 0.38 * t);
     }
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     es.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
-    const lm = new THREE.MeshBasicMaterial({ color: new THREE.Color(5, 5, 5), side: THREE.DoubleSide });
+    const lm = new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3, 3), side: THREE.DoubleSide });
     const add = (w, h, x, y, z, rx, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), lm); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); es.add(m); };
     add(40, 14, 0, 45, 10, Math.PI / 2, 0);
     add(10, 30, 50, 15, 0, 0, Math.PI / 2);
@@ -266,7 +286,7 @@ dd { margin: 0; min-width: 0; }
     grom:   new THREE.MeshStandardMaterial({ color: 0x7652c9, roughness: 0.55, metalness: 0 }),
     brass:  new THREE.MeshStandardMaterial({ color: 0xc8a14c, roughness: 0.32, metalness: 1 }),
     steel:  new THREE.MeshStandardMaterial({ color: 0x2c2f35, roughness: 0.38, metalness: 0.9 }),
-    alu:    new THREE.MeshStandardMaterial({ color: 0xa6abb2, roughness: 0.42, metalness: 0.85 }),
+    alu:    new THREE.MeshStandardMaterial({ color: 0x70767e, roughness: 0.4, metalness: 0.75 }),
     ledB:   new THREE.MeshStandardMaterial({ color: 0x9fc4ff, emissive: 0x2f6bff, emissiveIntensity: 1.6, roughness: 0.2, transparent: true, opacity: 0.92 }),
     ledG:   new THREE.MeshStandardMaterial({ color: 0xb9ffc8, emissive: 0x19d45a, emissiveIntensity: 1.4, roughness: 0.2, transparent: true, opacity: 0.92 }),
     dark:   new THREE.MeshStandardMaterial({ color: 0x232327, roughness: 0.7 })
@@ -431,7 +451,7 @@ dd { margin: 0; min-width: 0; }
       txt(c, B, 'VTX', 7.4, 1.5, 0.85);
       txt(c, B, 'BOOT', -6.6, 8.3, 0.6);
       txt(c, B, 'F722-2020', 5.0, 6.6, 0.95, 0, 'left');
-      txt(c, B, 'REV A · 10/26', 5.0, 7.9, 0.6, 0, 'left', FONT_MONO);
+      txt(c, B, 'REV A', 5.0, 8.6, 0.6, 0, 'left', FONT_MONO);
       txt(c, B, 'USB', 0, 5.7, 0.6);
       rectMM(c, B, 0, -2.5, 6.0, 10.2);
     });
@@ -501,6 +521,79 @@ dd { margin: 0; min-width: 0; }
     flushInstances();
   }
 
+  /* ---------- Signal traces (illustrative routing) ---------- */
+  const TRACE_COL = { spi: 0x45b0ff, uart: 0xffb547, motor: 0x5fd37f, i2c: 0xc792ff, usb: 0x7fe0e6, misc: 0xc9ced6 };
+  const traceGroup = new THREE.Group(); traceGroup.visible = false; board.add(traceGroup);
+  const traceMats = [];   // [{port, mat}]
+  function trace(pts, side, kind, port, w) {
+    w = w || 0.16;
+    const c = TRACE_COL[kind];
+    const mat = new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0.12, roughness: 0.85, metalness: 0, transparent: true, opacity: 1 });
+    traceMats.push({ port: port, mat: mat });
+    const y = side * (0.5 + 0.016);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const x1 = pts[i][0], z1 = pts[i][1], x2 = pts[i + 1][0], z2 = pts[i + 1][1];
+      const dx = x2 - x1, dz = z2 - z1, L = Math.hypot(dx, dz);
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(L, 0.024, w), mat);
+      seg.position.set((x1 + x2) / 2, y, (z1 + z2) / 2); seg.rotation.y = Math.atan2(-dz, dx);
+      traceGroup.add(seg);
+    }
+    pts.forEach(p => { const j = new THREE.Mesh(new THREE.CylinderGeometry(w / 2, w / 2, 0.024, 12), mat); j.position.set(p[0], y, p[1]); traceGroup.add(j); });
+  }
+  function via(x, z) {
+    for (const s of [1, -1]) {
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.11, 0.25, 18), M.gold);
+      ring.rotation.x = -s * Math.PI / 2; ring.position.set(x, s * 0.528, z); traceGroup.add(ring);
+      const hole = new THREE.Mesh(new THREE.CircleGeometry(0.11, 14), M.hole);
+      hole.rotation.x = -s * Math.PI / 2; hole.position.set(x, s * 0.527, z); traceGroup.add(hole);
+    }
+  }
+  function buildTraces() {
+    // Top side. Gyro: SPI1 + chip select + interrupt, MCU top pins straight to the gyro pads
+    [-1.25, -0.75, -0.25, 0.25, 0.75].forEach(x => trace([[x, 3.5], [x, 4.45]], 1, 'spi', 'gyro'));
+    // UART2 receiver pads, left edge
+    trace([[-6, -2.25], [-10.2, -2.25], [-10.95, -3.0], [-11.45, -3.0]], 1, 'uart', 'UART2');
+    trace([[-6, -1.75], [-10.7, -1.75], [-11.45, -1.0]], 1, 'uart', 'UART2');
+    // UART6 pads, left edge
+    trace([[-6, -0.25], [-8.9, -0.25], [-8.9, 4.25], [-9.65, 5.0], [-11.45, 5.0]], 1, 'uart', 'UART6');
+    trace([[-6, 1.25], [-8.2, 1.25], [-8.2, 6.0], [-9.2, 7.0], [-11.45, 7.0]], 1, 'uart', 'UART6');
+    // UART5 pads, right edge (between the decoupling caps)
+    trace([[6, -2.25], [10.45, -2.25], [11.2, -3.0], [11.45, -3.0]], 1, 'uart', 'UART5');
+    trace([[6, -0.75], [11.2, -0.75], [11.45, -1.0]], 1, 'uart', 'UART5');
+    // RSSI pad
+    trace([[6, 1.25], [11.2, 1.25], [11.45, 1.0]], 1, 'misc', 'RSSI');
+    // UART4 TX (SmartAudio) to the front-edge pad, threading between the LDO and the LED
+    trace([[3.75, 3.5], [3.75, 4.0], [4.75, 5.0], [4.75, 7.6], [6.15, 7.6], [6.15, 10.6], [7.0, 11.45]], 1, 'uart', 'UART4');
+    // Motors 5-8, I2C and SWD to the rear-edge pads
+    trace([[-3.75, -8.5], [-3.75, -8.9], [-5.4, -8.9], [-7, -10.5], [-7, -11.45]], 1, 'motor', 'Motors');
+    trace([[-3.25, -8.5], [-3.25, -9.75], [-5, -11.5]], 1, 'motor', 'Motors');
+    trace([[-2.75, -8.5], [-2.75, -11.2], [-3, -11.45]], 1, 'motor', 'Motors');
+    trace([[-1.25, -8.5], [-1.25, -8.8], [-1.0, -9.05], [-1.0, -11.45]], 1, 'motor', 'Motors');
+    trace([[0.75, -8.5], [0.75, -8.8], [1.0, -9.05], [1.0, -11.45]], 1, 'i2c', 'I2C');
+    trace([[2.75, -8.5], [2.75, -11.2], [3, -11.45]], 1, 'i2c', 'I2C');
+    trace([[3.25, -8.5], [3.25, -9.0], [5, -10.75], [5, -11.45]], 1, 'misc', 'SWD');
+    trace([[3.75, -8.5], [3.75, -8.75], [5.25, -8.75], [7, -10.5], [7, -11.45]], 1, 'misc', 'SWD');
+
+    // Bottom side, fed through vias from the MCU above.
+    // UART1 to the HD VTX plug (right edge)
+    via(3.6, 0.5); trace([[3.6, 0.5], [8.2, 0.5]], -1, 'uart', 'UART1');
+    via(3.6, 0.0); trace([[3.6, 0.0], [7.7, 0.0], [8.2, -0.5]], -1, 'uart', 'UART1');
+    // UART3 + I2C to the GPS plug (left edge)
+    via(-3.6, 0.0); trace([[-3.6, 0.0], [-7.7, 0.0], [-8.2, -0.5]], -1, 'uart', 'UART3');
+    via(-3.6, 0.5); trace([[-3.6, 0.5], [-8.2, 0.5]], -1, 'uart', 'UART3');
+    via(-3.6, 1.0); trace([[-3.6, 1.0], [-7.5, 1.0], [-8.0, 1.5], [-8.2, 1.5]], -1, 'i2c', 'I2C');
+    via(-3.6, 1.5); trace([[-3.6, 1.5], [-7.0, 1.5], [-8.0, 2.5], [-8.2, 2.5]], -1, 'i2c', 'I2C');
+    // ESC plug (rear edge): current sense, telemetry (UART4 RX), M1-M4
+    [[1.5, 'misc', 'CUR'], [0.5, 'uart', 'UART4'], [-0.5, 'motor', 'Motors'], [-1.5, 'motor', 'Motors'], [-2.5, 'motor', 'Motors'], [-3.5, 'motor', 'Motors']]
+      .forEach(([x, kind, port]) => { via(x, -7.8); trace([[x, -7.8], [x, -8.2]], -1, kind, port); });
+    // USB D- / D+ as a pair to the USB-C (front edge)
+    via(-3.4, 2.1); trace([[-3.4, 2.1], [-3.4, 6.6]], -1, 'usb', 'USB');
+    via(-2.9, 2.1); trace([[-2.9, 2.1], [-2.9, 6.6]], -1, 'usb', 'USB');
+  }
+  function focusTraces(port) {
+    traceMats.forEach(t => { t.mat.opacity = (!port || t.port === port) ? 1 : 0.14; t.mat.emissiveIntensity = (port && t.port === port) ? 0.5 : 0.12; });
+  }
+
   /* ---------- Pedestal, standoffs, screws ---------- */
   function buildPedestal() {
     const pts = [[0, -7], [30, -7], [31, -6.2], [31, -1.0], [30.2, 0], [0, 0]].map(p => new THREE.Vector2(p[0], p[1]));
@@ -509,7 +602,7 @@ dd { margin: 0; min-width: 0; }
     const K2 = 2048 / 62, P = (x, z) => [(x + 31) * K2, (z + 31) * K2];
     const tex = canvasTex(2048, 2048, (c) => {
       c.clearRect(0, 0, 2048, 2048);
-      c.strokeStyle = c.fillStyle = 'rgba(38, 42, 49, 0.78)';
+      c.strokeStyle = c.fillStyle = 'rgba(232, 234, 238, 0.55)';
       c.lineWidth = 0.12 * K2;
       c.beginPath(); c.arc(31 * K2, 31 * K2, 28.6 * K2, 0, Math.PI * 2); c.stroke();
       // 30 mm engraved rule in front of the board
@@ -608,7 +701,7 @@ dd { margin: 0; min-width: 0; }
   }
   let lastHover = 0;
   function hoverTest(e) { const now = performance.now(); if (now - lastHover < 60) return; lastHover = now; stage.classList.toggle('hover', !!hitAt(e)); }
-  function clickPick(e) { const id = hitAt(e); if (id) select([id], PARTS[id]); }
+  function clickPick(e) { const id = hitAt(e); if (id) { select([id], PARTS[id]); focusTraces(null); } }
 
   const helpers = [];
   function select(ids, rec) {
@@ -644,6 +737,7 @@ dd { margin: 0; min-width: 0; }
       const wantBottom = BOTTOM_IDS.has(p.targets[0]);
       if (wantBottom !== flipped) setFlip(wantBottom);
       select(p.targets, { portId: p.id, name: p.id + ' · ' + p.use, tag: p.pins, rows: [['Where', p.where]].concat(p.id === 'Motors' ? [['Timers', 'TIM3 · TIM8 · TIM5 · TIM4']] : [['Pins', p.pins]]) });
+      focusTraces(p.id);
     });
     li.appendChild(b); portsEl.appendChild(li);
   });
@@ -652,6 +746,13 @@ dd { margin: 0; min-width: 0; }
   const spinBtn = document.getElementById('spin');
   spinBtn.setAttribute('aria-pressed', String(spinning));
   spinBtn.addEventListener('click', () => { spinning = !spinning; spinBtn.setAttribute('aria-pressed', String(spinning)); });
+  const tracesBtn = document.getElementById('traces'), legendEl = document.getElementById('legend'), scaleNote = document.getElementById('scaleNote');
+  function setTraces(on) {
+    traceGroup.visible = on; tracesBtn.setAttribute('aria-pressed', String(on));
+    legendEl.hidden = !on; scaleNote.hidden = on;
+    document.querySelector('.hint').hidden = on;
+  }
+  tracesBtn.addEventListener('click', () => setTraces(!traceGroup.visible));
 
   /* ---------- Resize + loop ---------- */
   function resize() {
@@ -670,7 +771,7 @@ dd { margin: 0; min-width: 0; }
     } else if (spinning && !pointers.size) cam.theta += dt * 0.22;
     const goalFlip = flipped ? 1 : 0;
     flipT += (goalFlip - flipT) * (1 - Math.exp(-dt * (reduce ? 40 : 4)));
-    board.rotation.z = flipT * Math.PI;
+    board.rotation.x = flipT * Math.PI;
     board.position.y = 10 + Math.sin(flipT * Math.PI) * 17;
     helpers.forEach(h => h.update());
     placeCamera();
@@ -683,9 +784,28 @@ dd { margin: 0; min-width: 0; }
     ? Promise.all([document.fonts.load('600 40px "IBM Plex Sans Condensed"'), document.fonts.load('500 40px "IBM Plex Mono"')]).catch(() => {})
     : Promise.resolve();
   Promise.race([fontsReady, new Promise(r => setTimeout(r, 1500))]).then(() => {
-    buildBoard(); buildPads(); buildSilk(); populate(); buildPedestal();
+    buildBoard(); buildPads(); buildSilk(); populate(); buildTraces(); buildPedestal();
+    // Material colours are authored as sRGB hex; convert once to linear so the sRGB output shows them as designed
+    const seen = new Set();
+    scene.traverse(o => {
+      if (!o.material) return;
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => {
+        if (seen.has(m) || m.isShadowMaterial) return; seen.add(m);
+        if (m.color) m.color.convertSRGBToLinear();
+        if (m.emissive) m.emissive.convertSRGBToLinear();
+      });
+    });
     resize(); select(['mcu'], PARTS.mcu);
     document.getElementById('loading').remove();
+    if (location.hash === '#traces') setTraces(true);
+    // Small scripting hook, used to render the README images
+    window.fcViewer = {
+      cam: cam, setView: setView, setFlip: setFlip, setTraces: setTraces,
+      setSpin: (on) => { spinning = on; spinBtn.setAttribute('aria-pressed', String(on)); },
+      selectPort: (id) => { const b = document.getElementById('port-' + id); if (b) b.click(); },
+      settle: () => { tweening = false; Object.assign(cam, goal); flipT = flipped ? 1 : 0; },
+      clearSelection: () => { helpers.forEach(h => scene.remove(h)); helpers.length = 0; }
+    };
     loop();
   });
 })();
