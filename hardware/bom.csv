@@ -1,0 +1,26 @@
+ref,part,package,qty,rev_a_status,review_note
+U1,STM32F722RET6,LQFP64 10x10 mm,1,ok,Add VDDA ferrite + 1 uF + 100 nF (finding 12)
+U2,MPU6000,QFN24 4x4 mm,1,change,"No VLOGIC pin; do not solder exposed pad; 6 mm keepout from connectors (findings 1, 2, 5)"
+U3,AT7456E analog OSD,TSSOP28,1,change,"Needs 27 MHz crystal; ferrite-fed supply (findings 4, 10)"
+U4,W25Q128JVSIQ / W25Q128JVPIQ 16 MB flash,SOIC8 / WSON8,1,ok,
+U5,DPS310 or BMP280 baro,LGA 2x2.5 mm,1,move,"Move to (-8.5, 4.5) mm, open-cell foam (finding 7)"
+U6,LMR36520 5 V buck,HSOIC-8 4.9x6 mm,1,replace,"Replace with LMR36015 1 MHz forced-PWM, 2x3 mm (finding 3)"
+U7,LMR36520 10 V buck,HSOIC-8 4.9x6 mm,1,replace,"Replace with LMR36015 1 MHz forced-PWM, 2x3 mm (finding 3)"
+U8,TLV75533 LDO 3V3_MCU,SOT-23-5 / X2SON,1,ok,
+U9,TLV75533 LDO 3V3_GYRO,SOT-23-5 / X2SON,1,replace,Replace with TPS7A20 3.3 V (finding 8)
+U10,USBLC6-2SC6 ESD,SOT-23-6,1,ok,
+L1,4.7-10 uH shielded inductor >=2.5 A sat,3x3 mm,1,resize,Re-size for LMR36015 at 1 MHz
+L2,4.7-10 uH shielded inductor >=2.5 A sat,3x3 mm,1,resize,Re-size for LMR36015 at 1 MHz
+Y1,8 MHz crystal,3225,1,ok,
+Y2,27 MHz crystal (OSD),3225,1,add,Missing from Rev A (finding 4)
+Q1,AO3400 N-MOSFET buzzer,SOT-23,1,ok,
+D1,SMBJ33A TVS,SMB,1,move,Place at ESC plug VBAT entry (finding 6)
+D2,SS14 Schottky USB VBUS,SMA,1,ok,
+D3,Flyback diode across buzzer,SOD-323,1,add,Missing from Rev A (finding 15)
+F1,2 A polyfuse 5 V pads,0805 / 1206,1,ok,
+J1,JST-SH 8-pin ESC,SM08B-SRSS-TB,1,ok,
+J2,JST-SH 6-pin HD VTX,SM06B-SRSS-TB,1,ok,
+J3,JST-SH 6-pin GPS,SM06B-SRSS-TB,1,ok,
+J4,USB-C 16-pin receptacle,SMD,1,move,Overhang front edge 1.5 mm or re-place (finding 5)
+SW1,Tactile switch BOOT,3x2 mm SMD,1,move,Move to rear half of bottom side (finding 5)
+C_IN,47 uF low-ESR electrolytic or polymer,off-board on battery leads,1,change,Use 50 V on 6S builds (finding 14)
