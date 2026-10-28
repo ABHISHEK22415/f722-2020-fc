@@ -1,0 +1,5 @@
+{
+  "meta": {"filename": "f722-2020-fc.kicad_pro", "version": 1},
+  "board": {"design_settings": {"defaults": {}, "rules": {"min_clearance": 0.1, "min_track_width": 0.1, "min_via_diameter": 0.45, "min_through_hole_diameter": 0.2}}},
+  "schematic": {}
+}

@@ -50,6 +50,7 @@ The trace routing is illustrative: it shows where each signal goes, not a finish
 | [`firmware/betaflight/CUSTOMF722_2020.config`](firmware/betaflight/CUSTOMF722_2020.config) | Betaflight starting config (untested) |
 | [`viewer/index.html`](viewer/index.html) | Interactive 3D model; open it locally in any browser, or add `#traces` to the URL to start with traces on |
 | [`docs/images/`](docs/images) | Renders of the 3D model used in this README |
+| [`hardware/kicad/`](hardware/kicad) | Rev B KiCad schematic (importable into Altium), PDF, generator scripts |
 
 ## Next steps
 

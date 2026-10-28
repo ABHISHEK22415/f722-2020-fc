@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "fc")(type "KiCad")(uri "${KIPRJMOD}/fc.kicad_sym")(options "")(descr "F722-2020 custom symbols"))
+)
